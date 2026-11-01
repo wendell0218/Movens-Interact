@@ -1,0 +1,36 @@
+{
+  "model": {
+    "backbone": "checkpoints/Qwen2.5-Omni-3B",
+    "action_dim": 40,
+    "action_horizon": 30,
+    "action_exec_horizon": 20,
+    "rtc_max_delay": 11,
+    "state_dim": 40,
+    "hidden_dim": 1920,
+    "num_blocks": 7,
+    "num_heads": 30,
+    "qk_norm": "fp32_layer_norm",
+    "view_feature_dim": 2048,
+    "use_future_progress": true,
+    "future_progress_dim": 5,
+    "train_diffusion_steps": 1000,
+    "noise_scheduler": "flow"
+  },
+  "motion": {
+    "fps": 50,
+    "past_frames": 0,
+    "representation": "root40_v1",
+    "contact_protocol": "isaac_leg_delta_v2"
+  },
+  "prompt": "Move the apple to the plate.",
+  "sampling": {
+    "steps": 10,
+    "cfg_scale": 1.0,
+    "cfg_interval": [
+      0.2,
+      0.8
+    ],
+    "progress_total_frames": 1001,
+    "seed": 42
+  }
+}

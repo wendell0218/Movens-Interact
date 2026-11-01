@@ -1,0 +1,59 @@
+{
+  "root_z": 0.7114753127098083,
+  "robot_base_fixed": true,
+  "body40_channels_consumed": "joint29 only; root displacement/quaternion/height/contact outputs are not executed by this fixed-base diagnostic scene",
+  "actuation": {
+    "type": "position",
+    "body_kp": 80,
+    "body_kv": 5,
+    "hand_kp": 4,
+    "hand_kv": 0.25,
+    "robot_gravity_compensation": 1
+  },
+  "apple_xyz": [
+    0.3599892073952383,
+    0.07666218128722219,
+    0.8177732163119686
+  ],
+  "apple_body": "apple_root",
+  "apple_joint": "apple_freejoint",
+  "apple_attached": false,
+  "table_top_z": 0.7768732163119686,
+  "plate_xy": [
+    0.34740502391871947,
+    -0.10838035997196499
+  ],
+  "plate_body": "plate_root",
+  "joint_interface": "mj_name2id(model,mjOBJ_JOINT,name) -> jnt_qposadr; mj_name2id(model,mjOBJ_ACTUATOR,name) -> data.ctrl; never copy traversal order",
+  "camera": {
+    "name": "approx_ego_camera",
+    "fovy_degrees": 69,
+    "pos_in_torso": [
+      0.1,
+      0,
+      0.35
+    ],
+    "pitch_down_degrees": 35,
+    "calibrated": false
+  },
+  "format": "movens_interact_scene",
+  "scene": "scene.xml",
+  "robot_config": "robot.json",
+  "scene_sha256": "11625d0bef10599067efad3ab3f829d5f55ea7410ea7a2628284e76feef98ecb",
+  "source_scene_sha256": "5ac76185dde3af9c46bd1ad8cd258971293c825b1b7140a8583553b969f4ca23",
+  "assets_manifest": "manifest.json",
+  "upstream_repository": "https://github.com/NVlabs/GR00T-WholeBodyControl",
+  "upstream_revision": "b5040e20dea6871929d94f2e9d6fe0df298024ba",
+  "case_id": "baseline",
+  "group": "baseline",
+  "calibration": "Fixed tabletop demonstration-calibrated geometry; no independent generalization claim.",
+  "timing": {
+    "control_fps": 50,
+    "physics_fps": 500,
+    "prediction_horizon": 30,
+    "execution_horizon": 20,
+    "retained_prefix": 10,
+    "progress_total_frames": 1001
+  },
+  "contact_protocol": "isaac_leg_delta_v2"
+}

@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+*.pt
+*.pth
+*.safetensors
+.env
+.env.*
+.local/
+build/
+dist/
+/checkpoints/
+/data/
+/runs/
+/outputs/
+/assets/vendor/

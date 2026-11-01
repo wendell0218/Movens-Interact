@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="430" viewBox="0 0 1040 430">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker></defs>
+<rect width="1040" height="430" rx="20" fill="#f8fafc"/>
+<g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+<text x="520" y="37" font-size="25" font-weight="700" fill="#172033">Movens-Interact</text>
+<rect x="40" y="122" width="220" height="116" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="150" y="157" font-size="18" font-weight="700" fill="#172033">Current observation</text>
+<text x="150" y="187" font-size="15" fill="#475569">Ego RGB + task prompt</text>
+<text x="150" y="212" font-size="15" fill="#475569">Robot body and hand state</text>
+<rect x="319" y="134" width="205" height="92" rx="14" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
+<text x="421" y="171" font-size="20" font-weight="700" fill="#075985">Frozen Qwen</text>
+<text x="421" y="199" font-size="15" fill="#075985">Shared visual-language context</text>
+<rect x="596" y="73" width="185" height="90" rx="14" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+<text x="689" y="108" font-size="20" font-weight="700" fill="#1e40af">Body expert</text>
+<text x="689" y="137" font-size="15" fill="#1e40af">30 × 40 motion plan</text>
+<rect x="596" y="228" width="185" height="90" rx="14" fill="#fef3c7" stroke="#fbbf24" stroke-width="2"/>
+<text x="689" y="263" font-size="20" font-weight="700" fill="#92400e">Hand expert</text>
+<text x="689" y="292" font-size="15" fill="#92400e">30 × 14 joint plan</text>
+<rect x="842" y="137" width="157" height="100" rx="14" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+<text x="920" y="175" font-size="18" font-weight="700" fill="#166534">Synchronized</text>
+<text x="920" y="203" font-size="18" font-weight="700" fill="#166534">execution</text>
+<g fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrow)">
+<path d="M260 180 H309"/>
+<path d="M524 164 H553 V118 H586"/>
+<path d="M524 196 H553 V273 H586"/>
+<path d="M689 163 V218"/>
+<path d="M781 118 H811 V164 H832"/>
+<path d="M781 273 H811 V209 H832"/>
+</g>
+<text x="757" y="195" font-size="13" fill="#475569">clean Body plan</text>
+<rect x="226" y="356" width="588" height="43" rx="12" fill="#eef2ff"/>
+<text x="520" y="383" font-size="17" fill="#3730a3">50 Hz · predict 30 frames · execute 20 · retain 10</text>
+</g></svg>
