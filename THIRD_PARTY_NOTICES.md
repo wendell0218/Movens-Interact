@@ -10,7 +10,7 @@ entry points.
 
 The Movens-Zero XL checkpoint is downloaded from its
 [original model repository](https://huggingface.co/wendell0218/Movens-Zero-XL).
-It is not included in the Git repository or the adapter release files.
+It is not included in the Git repository and is downloaded separately.
 
 ## Qwen2.5-Omni-3B
 

@@ -6,9 +6,9 @@ import ssl
 import urllib.request
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--models", nargs="+", choices=["base", "backbone", "adapter", "body_init"],
-    default=["base", "backbone", "adapter", "body_init"])
+parser = argparse.ArgumentParser(description="Download the public Body base and Qwen processor/configuration files")
+parser.add_argument("--models", nargs="+", choices=["base", "backbone"],
+    default=["base", "backbone"])
 parser.add_argument("--checkpoint-root", default="checkpoints")
 parser.add_argument("--skip-verify", action="store_true",
     help="Skip SHA256 for existing files of the expected size; new downloads are always verified")
@@ -66,5 +66,5 @@ for name in args.models:
             url = f"https://huggingface.co/{entry['repo_id']}/resolve/{entry['revision']}/{file['filename']}"
             fetch(url, destination / file["filename"], file["bytes"], file["sha256"])
     else:
-        url = entry.get("url") or f"https://huggingface.co/{entry['repo_id']}/resolve/{entry['revision']}/{entry['filename']}"
+        url = f"https://huggingface.co/{entry['repo_id']}/resolve/{entry['revision']}/{entry['filename']}"
         fetch(url, destination, entry["bytes"], entry["sha256"])

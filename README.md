@@ -6,7 +6,7 @@
 
 <p>
   <a href="https://github.com/wendell0218/Movens-Interact"><img src="https://img.shields.io/badge/GitHub-Code-181717?logo=github&amp;logoColor=white" alt="Code"></a>
-  <a href="https://github.com/wendell0218/Movens-Interact/releases"><img src="https://img.shields.io/badge/Checkpoints-FFD21E" alt="Checkpoints"></a>
+  <a href="https://huggingface.co/wendell0218/Movens-Zero-XL"><img src="https://img.shields.io/badge/Base_Checkpoint-FFD21E" alt="Base checkpoint"></a>
   <a href="https://huggingface.co/datasets/nvidia/GR00T-N1.7-AppleToPlate"><img src="https://img.shields.io/badge/Dataset-FFD21E" alt="Dataset"></a>
   <a href="https://github.com/wendell0218/Movens-Zero"><img src="https://img.shields.io/badge/Movens--Zero-Backbone-2ea44f" alt="Movens-Zero"></a>
 </p>
@@ -53,7 +53,7 @@ conda install -c conda-forge ffmpeg
 
 ## 2. Download Models
 
-Download the XL backbone, processor files, released adapter, and Body initialization:
+Download the public XL backbone and Qwen processor files:
 
 ```bash
 source scripts/download_models.sh
@@ -62,12 +62,17 @@ source scripts/download_models.sh
 The files are written under `checkpoints/`. Model sources and checksums are listed
 in [`configs/models.json`](configs/models.json).
 
+The fitted task adapter and optional Body initialization are kept locally. Before
+inference or simulation, copy a trained task checkpoint to
+`checkpoints/Movens-Interact/adapter.pt`, or select it with `--checkpoint`.
+
 ## 3. Offline Inference
 
-Generate one Body/Hand action chunk from the included current-observation example:
+With a trained task checkpoint, generate one Body/Hand action chunk from the
+included current-observation example:
 
 ```bash
-source inference/predict.sh
+source inference/predict.sh --checkpoint runs/apple_from_base/model_best_nominal.pt
 ```
 
 See the [inference guide](inference/README.md) for observation formats, model
@@ -79,7 +84,7 @@ After preparing the demonstration, simulator observations, and visual context,
 start precision training:
 
 ```bash
-source training/train.sh
+source training/train.sh --no-body-init --output runs/apple_from_base
 ```
 
 See the [training guide](training/README.md) for the complete data pipeline,
@@ -92,7 +97,7 @@ The released simulation uses a fixed base and pauses physics during inference.
 
 ```bash
 source simulation/prepare_assets.sh
-source simulation/rollout.sh
+source simulation/rollout.sh --checkpoint runs/apple_from_base/model_best_nominal.pt
 ```
 
 See the [simulation guide](simulation/README.md) for setup, rendering, scene
@@ -104,7 +109,7 @@ Evaluate the frozen model on the predefined object-position and table-appearance
 cases:
 
 ```bash
-source simulation/evaluate.sh
+source simulation/evaluate.sh --checkpoint runs/apple_from_base/model_best_nominal.pt
 ```
 
 See [scene-variation evaluation](simulation/README.md) for case preparation,
@@ -112,7 +117,7 @@ batch evaluation, and output reports.
 
 ## 7. Results
 
-The released adapter completes grasping and stable plate placement in the fitted
+The fitted adapter completes grasping and stable plate placement in the fitted
 scene. A frozen-weight evaluation with one policy seed at each predefined scene
 gave the following results:
 

@@ -58,31 +58,27 @@
     ]
   },
   "adapter": {
-    "source": "github_release",
-    "repo_id": "wendell0218/Movens-Interact",
-    "tag": "v0.1.0",
+    "source": "local",
     "filename": "adapter.pt",
     "target": "checkpoints/Movens-Interact/adapter.pt",
-    "url": "https://github.com/wendell0218/Movens-Interact/releases/download/v0.1.0/adapter.pt",
     "sha256": "b65529f3f31468494a08a93657ffc9152cf456cea4cdb72b6cc20e6b72b23fae",
     "bytes": 1502009512,
     "step": 6300,
     "format": "movens_interact_dual_expert_v1",
     "tensor_equality_verified": true,
-    "verified_tensor_count": 170
+    "verified_tensor_count": 170,
+    "availability": "Stored locally; not published with the repository"
   },
   "body_init": {
-    "source": "github_release",
-    "repo_id": "wendell0218/Movens-Interact",
-    "tag": "v0.1.0",
+    "source": "local",
     "filename": "body_init.pt",
     "target": "checkpoints/Movens-Interact/body_init.pt",
-    "url": "https://github.com/wendell0218/Movens-Interact/releases/download/v0.1.0/body_init.pt",
     "sha256": "36c7abe6554b1103f61d12e7e60bb5c0391e8697f8a1f6b5378c0e66a768a0d1",
     "bytes": 369125918,
     "step": 3500,
     "format": "movens_interact_body_initialization_v1",
     "tensor_equality_verified": true,
-    "verified_tensor_count": 26
+    "verified_tensor_count": 26,
+    "availability": "Stored locally; not published with the repository"
   }
 }

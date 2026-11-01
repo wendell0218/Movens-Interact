@@ -10,7 +10,7 @@ Create the environment and install the package:
 conda create -n movens-interact python=3.10 -y
 conda activate movens-interact
 pip install -e ".[train]"
-source scripts/download_models.sh
+source scripts/download_models.sh --models base backbone
 source simulation/prepare_assets.sh
 ```
 
@@ -20,12 +20,12 @@ The training pipeline expects these local files:
 | --- | --- |
 | `checkpoints/Movens-Zero-XL/model.safetensors` | Original XL Body and Qwen weights |
 | `checkpoints/Qwen2.5-Omni-3B/` | Qwen configuration, tokenizer, and processor assets |
-| `checkpoints/Movens-Interact/body_init.pt` | Published Body-only initialization adapter |
+| `checkpoints/Movens-Interact/body_init.pt` | Optional fitted Body initialization, supplied locally |
 | `configs/body.json` | Matching Body architecture and motion configuration |
 | `configs/body_normalization.json` | Original 40D Body normalization |
 | `assets/scene.xml`, `assets/scene.json`, `assets/robot.json` | Fixed scene, joint mapping, and reset protocol |
 
-The Body initialization adapter contains weights from the earlier single-demonstration Body fitting stage. It contains no Hand weights or optimizer. The precision recipe loads that Body adapter and initializes Hand from the stated seed. The released final `adapter.pt` is an inference artifact; use a locally saved `checkpoint_last.pt` to resume an optimizer.
+The public downloader provides the original base checkpoint and Qwen processor assets. The fitted `body_init.pt` and final `adapter.pt` remain local and are not included in this code release. The fresh-clone commands below use `--no-body-init` to train from the original Movens-Zero weights. This differs from the initialization used by the current fitted local policy; evaluate the resulting checkpoint separately.
 
 The scripts use one CUDA device, eight CPU threads, BF16 model autocast, FP32 trainable parameters, and a per-process CUDA memory fraction of `0.35` for training. FK, physical losses, and angular metrics run in FP32. Qwen caching uses a memory fraction of `0.30` and releases its model when the process exits.
 
@@ -90,15 +90,15 @@ Each `data/apple_context/episode_XXXXXX.npz` contains FP16 `context[N,L,2048]`, 
 Run a CPU data and gradient-wiring check first:
 
 ```bash
-source training/train.sh --check-data-only --output runs/apple_data_check
+source training/train.sh --no-body-init --check-data-only --output runs/apple_data_check
 ```
 
 This validates successful paired teachers, split separation, all file identities, causal image lookup, known fixed-root consistency, and the FK gradient path. It checks that an analytical flow velocity recovers the clean target and that committed-prefix velocity gradients are zero. It loads no model weights and performs no optimizer updates.
 
-Start the first precision stage:
+Start the first precision stage from the original base:
 
 ```bash
-source training/train.sh --output runs/apple_precision
+source training/train.sh --no-body-init --output runs/apple_from_base
 ```
 
 Defaults are 300 Hand-only warmup updates followed by 3,000 joint precision updates, batch size 8, Body LR `5e-5`, Hand LR `2e-4`, and seed `20261101`. Warmup freezes the complete Body expert and checks that its fixed probe output remains bitwise unchanged. The joint stage trains the final three Body blocks and the action input, observation, and output projections. The original Qwen and all other Body modules stay frozen.
@@ -118,19 +118,18 @@ The flow convention is `X=(1-sigma)*A+sigma*noise`, velocity `noise-A`, and clea
 
 Body uses the unchanged original 40D normalizer. Hand statistics use training episodes only. Hand-state ranges have a minimum width of `0.1` radians; action ranges retain their measured training bounds. Constant action channels remain recorded as protocol metadata. Raw generative metrics do not project those channels to constants, and zero right-hand targets do not establish a learned right-hand skill.
 
-To start directly from original Movens-Zero weights, add `--no-body-init` and select a new output directory. This changes the initialization and is not the recipe used for the released adapter.
-
 ## 6. Resume and refine
 
 After the first stage reaches global step 3,300, continue for another 3,000 updates in a new output directory:
 
 ```bash
 source training/train.sh \
-  --resume runs/apple_precision/checkpoint_last.pt \
+  --no-body-init \
+  --resume runs/apple_from_base/checkpoint_last.pt \
   --joint-steps 6000 \
   --body-lr-scale 0.5 --hand-lr-scale 0.25 \
   --cosine-decay --lr-min-scale 0.2 \
-  --output runs/apple_precision_refined
+  --output runs/apple_from_base_refined
 ```
 
 `--joint-steps` is the total number of joint-stage updates, not an increment. With 300 warmup updates, `6000` ends at global step 6,300. The resume file restores both experts, Adam state, random-number state, and progress. It must match the original data, cache, scene, normalization, architecture, seed, batch settings, and loss recipe.
@@ -144,6 +143,33 @@ max(left_wrist_RMS_m, right_wrist_RMS_m) / 0.01 + left_hand_B_hat_MAE_rad / 0.03
 ```
 
 The held split is reported independently and does not select the checkpoint. Open-loop fit metrics do not establish closed-loop task success; run the separate simulator policy evaluation on the selected adapter.
+
+### Optional fitted Body initialization
+
+When a fitted Body-only initializer is supplied locally, place it at `checkpoints/Movens-Interact/body_init.pt` and run:
+
+```bash
+source training/train.sh \
+  --body-init checkpoints/Movens-Interact/body_init.pt \
+  --output runs/apple_precision
+source training/train.sh \
+  --resume runs/apple_precision/checkpoint_last.pt \
+  --joint-steps 6000 \
+  --body-lr-scale 0.5 --hand-lr-scale 0.25 \
+  --cosine-decay --lr-min-scale 0.2 \
+  --output runs/apple_precision_refined
+```
+
+The existing local workspace has this initializer, so this fitted recipe remains usable there. It contains Body weights from the earlier single-demonstration fitting stage, without Hand weights or an optimizer. The current fitted local policy used this initialization, 300 Hand warmup updates, 3,000 joint updates, and another 3,000 refinement updates. It is distinct from the fresh-clone base initialization above. Resume uses the saved optimizer checkpoint and does not reload the initializer.
+
+For inference or simulation, supply a locally trained checkpoint explicitly:
+
+```bash
+source inference/predict.sh --checkpoint runs/apple_from_base_refined/model_best_nominal.pt
+source simulation/rollout.sh --checkpoint runs/apple_from_base_refined/model_best_nominal.pt --output outputs/rollout
+```
+
+`model_delta.pt`, `model_best_nominal.pt`, and `checkpoint_last.pt` are supported policy inputs. Only `checkpoint_last.pt` includes optimizer state for training resume. To use the default inference path, copy a chosen local policy checkpoint to `checkpoints/Movens-Interact/adapter.pt`.
 
 ## Outputs
 
@@ -172,7 +198,8 @@ Body adapter tensors contain absolute parameter values for the listed modules, n
 | Collect | `--prepared`, `--scene-setup`, `--robot-config` | Prepared manifest and supplied asset JSONs |
 | Cache | `--manifest`, `--output`, `--batch-size` | Teacher index, `data/apple_context`, `8` |
 | Train | `--manifest`, `--context-dir`, `--scene-xml` | Teacher index, context directory, `assets/scene.xml` |
-| Train | `--body-init`, `--base-checkpoint` | Published Body initializer and original XL weights |
+| Train | `--body-init`, `--no-body-init` | Optional local initializer; use `--no-body-init` without it |
+| Train | `--base-checkpoint` | Original XL weights |
 | Train | `--hand-warmup-steps`, `--joint-steps` | `300`, `3000` |
 | Train | `--batch-size`, `--stride` | `8`, `10` |
 | Train | `--eval-every`, `--save-every`, `--eval-batches` | `500`, `500`, `0` (all windows) |

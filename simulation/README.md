@@ -21,10 +21,13 @@ Binary assets are fetched directly from upstream and stored under `assets/vendor
 ## Run the policy
 
 ```bash
-source simulation/rollout.sh --seed 42 --output outputs/rollout
+source simulation/rollout.sh --checkpoint runs/apple_from_base/model_best_nominal.pt --seed 42 --output outputs/rollout
 ```
 
-Default model locations are:
+Supply a locally trained task checkpoint with `--checkpoint`, as above. The fitted
+task weights are kept locally; the [training guide](../training/README.md) covers
+training from the public backbone. To use the defaults, copy your task checkpoint
+to the adapter path below. Default model locations are:
 
 ```text
 checkpoints/Movens-Interact/adapter.pt
@@ -49,7 +52,7 @@ Its report deliberately leaves policy success unset.
 For a saved teacher reset, only the requested reset protocol is read:
 
 ```bash
-source simulation/rollout.sh --reset-index data/apple_teacher/index.json --reset-episode 4 --output outputs/held_reset
+source simulation/rollout.sh --checkpoint runs/apple_from_base/model_best_nominal.pt --reset-index data/apple_teacher/index.json --reset-episode 4 --output outputs/held_reset
 ```
 
 ## Outputs and success checks
@@ -76,7 +79,7 @@ Rendering uses saved physical states and changes only the camera view. It does n
 
 ```bash
 source simulation/randomize.sh --output outputs/randomization
-source simulation/evaluate.sh --index outputs/randomization/index.json --output outputs/robustness
+source simulation/evaluate.sh --checkpoint runs/apple_from_base/model_best_nominal.pt --index outputs/randomization/index.json --output outputs/robustness
 ```
 
 The 12 predefined cases are the baseline, four apple XY offsets of ±1 cm, four plate XY offsets of ±2 cm, two table appearance changes, and one combined case. Table variants change only visual material; friction, collision, inertia, camera, robot reset and servo settings remain fixed. XML-requested and post-settle object poses are recorded separately because a free apple can roll during settling.

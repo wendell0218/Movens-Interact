@@ -1,17 +1,18 @@
 # Offline prediction
 
-This entry predicts one paired Body/Hand action chunk from a current ego image and robot observation. Install the environment and model files using the [main README](../README.md), then run:
+This entry predicts one paired Body/Hand action chunk from a current ego image and robot observation. Install the environment and public backbone files using the [main README](../README.md), then supply a locally trained task checkpoint:
 
 ```bash
-source inference/predict.sh
+source inference/predict.sh --checkpoint runs/apple_from_base/model_best_nominal.pt
 ```
 
-The bundled `examples/ego.png` and `examples/observation.npz` are a matched simulated observation. The command writes `outputs/prediction/plan.npz` and `summary.json`.
+The bundled `examples/ego.png` and `examples/observation.npz` are a matched simulated observation. The command writes `outputs/prediction/plan.npz` and `summary.json`. The fitted task weights are kept locally; see the [training guide](../training/README.md) to create a checkpoint from the public backbone.
 
 ## Inputs
 
 ```bash
 source inference/predict.sh \
+  --checkpoint runs/apple_from_base/model_best_nominal.pt \
   --image /path/to/current_ego.png \
   --observation /path/to/current_observation.npz \
   --frame 0 \
@@ -33,7 +34,7 @@ Model defaults are `checkpoints/Movens-Interact/adapter.pt`, `checkpoints/Movens
 
 ## Plan outputs
 
-The plan contains `body_absolute[30,36]`, `hand_absolute[30,14]`, normalized Body/Hand predictions, raw hand predictions, the heading anchor, measured input state and timing diagnostics. Sampling uses ten flow steps and the checkpoint's CFG configuration. The supplied checkpoint uses CFG 1.
+The plan contains `body_absolute[30,36]`, `hand_absolute[30,14]`, normalized Body/Hand predictions, raw hand predictions, the heading anchor, measured input state and timing diagnostics. Sampling uses ten flow steps and the checkpoint's CFG configuration. The fitted checkpoint uses CFG 1.
 
 Execute 20 synchronized Body/Hand frames. At the next observation, pass the entire previous archive with `--previous-plan` and set `--frame 20`. The model re-encodes the retained ten-frame body prefix into the current anchor and keeps the hand prefix on the same physical frames. Continue with newly captured observations for later chunks.
 
@@ -45,7 +46,7 @@ Offline prediction does not execute physics or verify object contact. Use [simul
 from movens_interact.model import MovensInteractModel
 
 model = MovensInteractModel.from_pretrained(
-    "checkpoints/Movens-Interact/adapter.pt",
+    "runs/apple_from_base/model_best_nominal.pt",
     device="cuda:0",
 )
 plan = model.predict(ego_rgb, body_abs, hand_state, frame=0, seed=42)
